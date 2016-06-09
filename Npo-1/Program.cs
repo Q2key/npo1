@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,49 +14,77 @@ namespace Npo_1
         static void Main(string[] args)
         {
             var m = new Matrix();
-            var array = m.ReadArrayFromFile(@"D:\input.txt");
-            /*
-            foreach (var arr in array)
+            var matrix = m.CreateMatrix(@"D:\input.txt");
+            var a = new int[] {1,2,3,3,2};
+            for (var i = 0; i < matrix.GetLength(0); i++)
             {
-                foreach (var a in arr)
+                for (var j = 0; j < matrix.GetLength(1); j++)
                 {
-                    Console.Write(@" {0} ",a);
+                    Console.Write(matrix[i, j]);
                 }
                 Console.WriteLine();
-            }*/
-            var a = new int[] { 1, 2, 3, 4 };
-            var a2 = new int[] { 9, 11, 8, 10 };
+            }
+            Console.WriteLine(m.GetMonosequenceLenght(a, 0));
             Console.ReadKey();
         }
     }
 
     class Matrix
     {
-        public int[][] ReadArrayFromFile(string path)
+        public int[,] CreateMatrix(string path)
         {
-            var colandrow = File.ReadAllLines(path).Skip(0).First();
-            var columns = int.Parse(colandrow.Split()[0]);
-            var rows = int.Parse(colandrow.Split()[1]);
+
+            var colandrows = File.ReadAllLines(path).Skip(0).First().Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Select(int.Parse).ToArray();
+            var columns = colandrows[0];
+            var rows = colandrows[1];
+
             var sarray = File.ReadAllLines(path).Skip(1).ToArray();
             var a = new int[columns][];
+
             for (var i = 0; i < a.Length; i++)
             {
-
-                a[i] = sarray[i].Split().Select(int.Parse).ToArray();
+                a[i] = sarray[i].Split(' ').
+                Where(x => !string.IsNullOrWhiteSpace(x)).
+                Select(int.Parse).ToArray();
             }
-            return a;
-        }
-        public int GetMonosequenceLenght(int[] array)
-        {
-            var msl = 0;
-            for (int i = 0; i < array.Length; i++)
+
+            var matrix = new int[columns, rows];
+            for (var i = 0; i < matrix.GetLength(0); i++)
             {
-
+                for (var j = 0; j < rows; j++)
+                {
+                    matrix[i, j] = a[i][j];
+                }
             }
 
-            return msl;
+            return matrix;
         }
+        public int GetMonosequenceLenght(int[] array, int point)
+        {
 
+            var prev = array[0];
+            var t = 0;
 
+            if (prev<array[1])
+            {
+                Console.WriteLine("inc " + prev);
+            }
+            else
+            {
+                Console.WriteLine("desc " + prev);
+            }
+           
+            for (var i = 1; i < array.Length; i++)
+            {
+                var j = i;
+                while (j < array.Length && prev < array[j] )
+                {
+                    prev = array[j];
+                    j++;
+                    Console.WriteLine("inc " + prev + " i - " + i + " j - " + j);
+                }
+            }     
+            return 666;
+        }
     }
 }
