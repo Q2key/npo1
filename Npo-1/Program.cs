@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,23 +15,111 @@ namespace Npo_1
         static void Main(string[] args)
         {
             var m = new Matrix();
-            var matrix = m.CreateMatrix(@"D:\input.txt");
-            var a = new int[] {1,2,3,3,2};
+            var path = @"D:\input.txt";
+            var matrix = m.CreateMatrix(path);
+            
+            Console.WriteLine("Input matrix");
             for (var i = 0; i < matrix.GetLength(0); i++)
             {
                 for (var j = 0; j < matrix.GetLength(1); j++)
                 {
-                    Console.Write(matrix[i, j]);
+                    Console.Write(matrix[i, j] + " ");
                 }
                 Console.WriteLine();
             }
-            Console.WriteLine(m.GetMonosequenceLenght(a, 0));
+            m.SortMatrix();
             Console.ReadKey();
         }
     }
-
     class Matrix
-    {
+    {         
+        public void SortMatrix()
+        {   
+            
+            Console.WriteLine();
+            var m = CreateMatrix(@"D:\input.txt");
+            var columnlist = new List<List<int>>();
+            var rowsumnlist = new List<List<int>>();
+            var t = new List<int>();
+            Console.WriteLine("Columns Sorted");
+            for (var i = 0; i < m.GetLength(0); i++)
+            {   
+                          
+                for (var j = 0; j < m.GetLength(1); j++)
+                {
+                    t.Add(m[i,j]);
+                    Console.Write(m[i,j] + " ");
+                }
+                columnlist.Add(t);
+                t = new List<int>();
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+
+            for (int i = 0; i < columnlist.Count; i++)
+            {
+                var max = i;
+                for (int j = i + 1; j < columnlist.Count; j++)
+                {
+                    if (GetMonosequenceLenght(columnlist[max].ToArray()) < GetMonosequenceLenght(columnlist[j].ToArray()))
+                    {
+                         max = j;
+                    }
+                    var temp = columnlist [max];
+                    columnlist[max] = columnlist[i];
+                    columnlist[i] = temp;
+                }
+            }
+            Console.WriteLine("Rows Sorted");
+            foreach (var column in columnlist)
+            {
+                foreach (var l in column)
+                {
+                    Console.Write(l + " ");
+                }
+                Console.WriteLine();
+            }
+            
+            for (int i = 0; i < m.GetLength(1); i++)
+            {               
+                for (int j = 0; j < columnlist.Count; j++)
+                {   
+                    t.Add(columnlist[j][i]);                  
+                }
+               rowsumnlist.Add(t);
+               t = new List<int>();
+            }
+            for (int i = 0; i < rowsumnlist.Count; i++)
+            {
+                var max = i;
+                for (int j = i + 1; j < rowsumnlist.Count; j++)
+                {
+                    if (GetMonosequenceLenght(rowsumnlist[max].ToArray()) < GetMonosequenceLenght(rowsumnlist[j].ToArray()))
+                    {
+                        max = j;
+                    }
+                    var temp = rowsumnlist[max];
+                    rowsumnlist[max] = rowsumnlist[i];
+                    rowsumnlist[i] = temp;
+                }
+            }
+            var outstr = string.Empty;
+            
+            for (int i = 0; i < rowsumnlist.Count-1; i++)
+            {
+                var ts = new List<string>();
+                foreach (var list in rowsumnlist)
+                {
+                    outstr += list[i] + " ";                
+                    ts.Add(list[i] + " ");
+                }
+                outstr += " \n";
+            }
+            File.WriteAllText(@"D:\output.txt",outstr);
+        }
+
+       
+
         public int[,] CreateMatrix(string path)
         {
 
@@ -59,32 +148,42 @@ namespace Npo_1
 
             return matrix;
         }
-        public int GetMonosequenceLenght(int[] array, int point)
+        public int GetMonosequenceLenght(int[] array)
         {
-
-            var prev = array[0];
-            var t = 0;
-
-            if (prev<array[1])
+            var x = 0;
+            var y = 0;
+            int seqlengthb;
+            var seqlengtha = seqlengthb = 0;
+            for (int i = 0; i < array.Length-1; i++)
             {
-                Console.WriteLine("inc " + prev);
-            }
-            else
-            {
-                Console.WriteLine("desc " + prev);
-            }
-           
-            for (var i = 1; i < array.Length; i++)
-            {
-                var j = i;
-                while (j < array.Length && prev < array[j] )
+                if (array[i] < array[i + 1])
                 {
-                    prev = array[j];
-                    j++;
-                    Console.WriteLine("inc " + prev + " i - " + i + " j - " + j);
+                    x++;
                 }
-            }     
-            return 666;
+                else
+                {
+                    x = 0;
+                }
+                if (x >= seqlengtha)
+                {
+                    seqlengtha = x;
+                }
+                if (array[i] > array[i + 1])
+                {
+                    y++;
+                }
+                else
+                {
+                    y = 0;
+                }
+                if (y >= seqlengthb)
+                {
+                    seqlengthb = y;
+                }
+            }
+            seqlengtha++;
+            seqlengthb++;
+            return seqlengtha > seqlengthb ? seqlengtha : seqlengthb;
         }
     }
 }
