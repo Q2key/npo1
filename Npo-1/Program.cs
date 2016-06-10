@@ -15,7 +15,7 @@ namespace Npo_1
         static void Main(string[] args)
         {
             var m = new Matrix();
-            var path = @"D:\input.txt";
+            var path = @"C:\input.txt";
             var matrix = m.CreateMatrix(path);
             
             Console.WriteLine("Input matrix");
@@ -27,28 +27,28 @@ namespace Npo_1
                 }
                 Console.WriteLine();
             }
-            m.SortMatrix();
+            m.SortMatrix(m.CreateMatrix(path));
             Console.ReadKey();
         }
     }
     class Matrix
     {         
-        public void SortMatrix()
+        public void SortMatrix(int [,] matrix)
         {   
             
             Console.WriteLine();
-            var m = CreateMatrix(@"D:\input.txt");
+            matrix = CreateMatrix(@"C:\input.txt");
             var columnlist = new List<List<int>>();
             var rowsumnlist = new List<List<int>>();
             var t = new List<int>();
             Console.WriteLine("Columns Sorted");
-            for (var i = 0; i < m.GetLength(0); i++)
+            for (var i = 0; i < matrix.GetLength(0); i++)
             {   
                           
-                for (var j = 0; j < m.GetLength(1); j++)
+                for (var j = 0; j < matrix.GetLength(1); j++)
                 {
-                    t.Add(m[i,j]);
-                    Console.Write(m[i,j] + " ");
+                    t.Add(matrix[i,j]);
+                    Console.Write(matrix[i,j] + " ");
                 }
                 columnlist.Add(t);
                 t = new List<int>();
@@ -80,7 +80,7 @@ namespace Npo_1
                 Console.WriteLine();
             }
             
-            for (int i = 0; i < m.GetLength(1); i++)
+            for (int i = 0; i < matrix.GetLength(1); i++)
             {               
                 for (int j = 0; j < columnlist.Count; j++)
                 {   
@@ -115,13 +115,27 @@ namespace Npo_1
                 }
                 outstr += " \n";
             }
-            File.WriteAllText(@"D:\output.txt",outstr);
+            try
+            {
+                File.WriteAllText(@"C:\output.txt", outstr);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("File not exists");               
+            }
+           
         }
 
        
 
         public int[,] CreateMatrix(string path)
         {
+            
+            if (!File.Exists(path))
+            {
+                Console.Write("\'Input.txt\' File is not exist");
+            }
 
             var colandrows = File.ReadAllLines(path).Skip(0).First().Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Select(int.Parse).ToArray();
             var columns = colandrows[0];
