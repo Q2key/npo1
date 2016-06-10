@@ -126,15 +126,14 @@ namespace Npo_1
             }
            
         }
-
-       
-
         public int[,] CreateMatrix(string path)
         {
             
             if (!File.Exists(path))
             {
                 Console.Write("\'Input.txt\' File is not exist");
+                Console.Read();
+                return new int[,] {};
             }
 
             var colandrows = File.ReadAllLines(path).Skip(0).First().Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Select(int.Parse).ToArray();
